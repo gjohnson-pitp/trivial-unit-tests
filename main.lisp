@@ -42,4 +42,8 @@ on-fail (function)"))
   (handler-case (funcall (test-body test))
     (error (error) (on-fail test error))))
 
-(defmethod on-fail ((test test) error))
+(defmethod on-fail ((test test) error)
+  (format t
+          "~&In ~S: ~A"
+          (test-name test)
+          error))

@@ -18,4 +18,9 @@
       (call-next-method))
     (assert (not on-fail-called))
     (run-test test)
-    (assert on-fail-called)))
+    (assert on-fail-called))
+  (assert (string= (with-output-to-string (*standard-output*)
+                     (run-test (make-instance 'test
+                                              :name 'should-fail
+                                              :body (lambda () (error "Failing on purpose.")))))
+                   "In SHOULD-FAIL: Failing on purpose.")))
