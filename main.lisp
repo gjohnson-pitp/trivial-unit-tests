@@ -23,4 +23,7 @@ SEE ALSO:
 run-test (function)"))
 
 (defmethod run-test ((test test))
-  (funcall (test-body test)))
+  (handler-case (funcall (test-body test))
+    (error (error) (on-fail test error))))
+
+(defmethod on-fail ((test test) error))
