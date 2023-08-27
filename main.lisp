@@ -16,8 +16,8 @@ test (class)"))
          :initarg :body))
   (:documentation "(make-instance 'test :name [a symbol] :body [a closure])
 
-A test object that takes a symbol as a name and a closure as a body. Run it with
-run-test.
+A test object that takes a symbol as a name and a closure as a
+body. Run it with run-test.
 
 SEE ALSO:
 run-test (function)"))
