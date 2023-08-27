@@ -18,7 +18,9 @@ on-fail (function)"))
 
 Hook called when a test fails. By default, called in run-test when the
 test body throws an error. It's passed the test object for the failed
-test and the error object thrown.
+test and the error object thrown. The default method on the predefined
+test class outputs a string in the format \"In [test-name]: [error
+message]\".
 
 SEE ALSO:
 run-test (function)
