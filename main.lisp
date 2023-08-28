@@ -38,7 +38,8 @@ body. Run it with run-test.
 
 SEE ALSO:
 run-test (function)
-on-fail (function)"))
+on-fail (function)
+deftest (macro)"))
 
 (defmethod run-test ((test test))
   (handler-case (funcall (test-body test))
@@ -50,11 +51,44 @@ on-fail (function)"))
           (test-name test)
           error))
 
+(defgeneric add-test (suite test)
+  (:documentation "(add-test suite test)
+
+Adds the given test to the suite. For the method on the predefined
+suite class, the test must have a test-name method, which should
+return a symbol.
+
+SEE ALSO:
+suite (class)"))
+
+(defgeneric run-tests (suite)
+  (:documentation "(run-tests suite)
+
+Runs all the tests in the given suite.
+
+SEE ALSO:
+suite (class)
+test (class)
+run-test (function)"))
+
 (defclass suite ()
   ((name :reader suite-name
          :initarg :name)
    (test-table :reader suite-test-table
-               :initform (make-hash-table))))
+               :initform (make-hash-table)))
+  (:documentation "(make-instance 'suite :name [a symbol])
+
+A suite object that takes a symbol as a name. Add tests to it with
+add-test, and run all the tests in a suite with run-tests. Save a
+suite to refer to it by name later using (setf suite), and retrieve it
+with (suite name).
+
+SEE ALSO:
+add-test (function)
+run-tests (function)
+test (class)
+*suites* (variable)
+suite (function)"))
 
 (defmethod add-test ((suite suite) test)
   (setf (gethash (test-name test) (suite-test-table suite)) test))
@@ -65,9 +99,22 @@ on-fail (function)"))
     do (run-test test)))
 
 (defvar *suites*
-  (make-hash-table))
+  (make-hash-table)
+  "Global table of test suites. Read it with (suite name), or
+add/overwrite a suite with (setf (suite name) suite).
+
+SEE ALSO:
+suite (class, function)")
 
 (defun suite (name)
+  "(suite name)
+
+Returns the suite with the given name. Suites can be registered
+with (setf (suite name) suite).
+
+SEE ALSO:
+*suites* (variable)
+suite (class)"
   (multiple-value-bind (suite foundp) (gethash name *suites*)
     (unless foundp
       (error "No suite named ~A" name))
@@ -77,5 +124,17 @@ on-fail (function)"))
   (setf (gethash name *suites*) new-suite))
 
 (defmacro deftest (name (suite) &body body)
+  "(deftest name (suite) [body])
+
+Macro to define a new test. A test object is instantiated and added to
+the suite named by the \"suite\" argument (not evaluated).
+
+A test is considered to fail when an error is thrown from its body,
+and to pass if no error is thrown.
+
+SEE ALSO:
+*suites* (variable)
+suite (class, function)
+test (class)"
   `(add-test (suite ',suite)
              (make-instance 'test :name ',name :body (lambda () ,@body))))
