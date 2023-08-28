@@ -63,3 +63,15 @@ on-fail (function)"))
   (loop
     for test being the hash-values of (suite-test-table suite)
     do (run-test test)))
+
+(defvar *suites*
+  (make-hash-table))
+
+(defun suite (name)
+  (multiple-value-bind (suite foundp) (gethash name *suites*)
+    (unless foundp
+      (error "No suite named ~A" name))
+    suite))
+
+(defun (setf suite) (new-suite name)
+  (setf (gethash name *suites*) new-suite))
