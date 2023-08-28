@@ -49,3 +49,17 @@ on-fail (function)"))
           "~&In ~S: ~A"
           (test-name test)
           error))
+
+(defclass suite ()
+  ((name :reader suite-name
+         :initarg :name)
+   (test-table :reader suite-test-table
+               :initform (make-hash-table))))
+
+(defmethod add-test ((suite suite) test)
+  (setf (gethash (test-name test) (suite-test-table suite)) test))
+
+(defmethod run-tests ((suite suite))
+  (loop
+    for test being the hash-values of (suite-test-table suite)
+    do (run-test test)))

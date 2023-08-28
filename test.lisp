@@ -1,6 +1,15 @@
 
 (in-package :trivial-unit-tests)
 
+(defclass mock-test ()
+  ((name :reader test-name
+         :initform (gensym))
+   (was-run :accessor was-run
+            :initform nil)))
+
+(defmethod run-test ((test mock-test))
+  (setf (was-run test) t))
+
 (defun run-self-tests ()
   ;; Should call test body
   (let* ((was-run nil)
@@ -26,4 +35,13 @@
                      (run-test (make-instance 'test
                                               :name 'should-fail
                                               :body (lambda () (error "Failing on purpose.")))))
-                   "In SHOULD-FAIL: Failing on purpose.")))
+                   "In SHOULD-FAIL: Failing on purpose."))
+  ;; Test suites should call all tests added to them
+  (let ((suite (make-instance 'suite :name 'example))
+        (tests (loop
+                 for i from 1 to 3
+                 collect (make-instance 'mock-test))))
+    (dolist (test tests)
+      (add-test suite test))
+    (run-tests suite)
+    (assert (every #'was-run tests))))
