@@ -75,3 +75,7 @@ on-fail (function)"))
 
 (defun (setf suite) (new-suite name)
   (setf (gethash name *suites*) new-suite))
+
+(defmacro deftest (name (suite) &body body)
+  `(add-test (suite ',suite)
+             (make-instance 'test :name ',name :body (lambda () ,@body))))
