@@ -1,3 +1,10 @@
 
 (defpackage :trivial-unit-tests
-  (:use :cl))
+  (:use :cl)
+  (:export #:run-test
+           #:on-fail
+           #:test
+           #:suite
+           #:add-test
+           #:run-tests
+           #:deftest))
