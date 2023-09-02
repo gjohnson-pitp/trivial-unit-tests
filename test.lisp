@@ -13,7 +13,11 @@
 
 (setf (suite 'self-tests) (make-instance 'suite :name 'self-tests))
 
-(deftest should-call-test-body (self-tests)
+(setf (suite 'test-tests) (make-instance 'suite :name 'test-tests))
+
+(setf (suite 'suite-tests) (make-instance 'suite :name 'suite-tests))
+
+(deftest should-call-test-body (test-tests)
   (let* ((was-run nil)
          (test (make-instance 'test
                               :name 'example
@@ -22,7 +26,7 @@
     (run-test test)
     (assert was-run)))
 
-(deftest should-call-on-fail (self-tests)
+(deftest should-call-on-fail (test-tests)
   (let ((on-fail-called nil)
         (test (make-instance 'test
                              :name 'should-fail
@@ -35,7 +39,7 @@
       (run-test test))
     (assert on-fail-called)))
 
-(deftest should-print-failure-message (self-tests)
+(deftest should-print-failure-message (test-tests)
   (assert (string= (with-output-to-string (*standard-output*)
                      (run-test (make-instance
                                 'test
@@ -44,7 +48,7 @@
                                         (error "Failing on purpose.")))))
                    "In SHOULD-FAIL: Failing on purpose.")))
 
-(deftest should-call-all-tests-in-suite (self-tests)
+(deftest should-call-all-tests-in-suite (suite-tests)
   (let ((suite (make-instance 'suite :name 'example))
         (tests (loop
                  for i from 1 to 3
@@ -54,7 +58,7 @@
     (run-tests suite)
     (assert (every #'was-run tests))))
 
-(deftest should-only-have-one-test-per-name (self-tests)
+(deftest should-only-have-one-test-per-name (suite-tests)
   (let ((suite (make-instance 'suite :name 'example))
         (test1 (make-instance 'mock-test :name 'a-test))
         (test2 (make-instance 'mock-test :name 'a-test)))
@@ -64,5 +68,10 @@
     (assert (not (was-run test1)))
     (assert (was-run test2))))
 
+(defparameter *self-test-suites*
+  '(test-tests
+    suite-tests))
+
 (defun run-self-tests ()
-  (run-tests (suite 'self-tests)))
+  (dolist (suite-name *self-test-suites*)
+    (run-tests (suite suite-name))))
