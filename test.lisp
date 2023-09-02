@@ -3,9 +3,10 @@
 
 (defclass mock-test ()
   ((name :reader test-name
-         :initform (gensym))
+         :initarg :name)
    (was-run :accessor was-run
-            :initform nil)))
+            :initform nil))
+  (:default-initargs :name (gensym)))
 
 (defmethod run-test ((test mock-test))
   (setf (was-run test) t))
@@ -52,6 +53,16 @@
       (add-test suite test))
     (run-tests suite)
     (assert (every #'was-run tests))))
+
+(deftest should-only-have-one-test-per-name (self-tests)
+  (let ((suite (make-instance 'suite :name 'example))
+        (test1 (make-instance 'mock-test :name 'a-test))
+        (test2 (make-instance 'mock-test :name 'a-test)))
+    (add-test suite test1)
+    (add-test suite test2)
+    (run-tests suite)
+    (assert (not (was-run test1)))
+    (assert (was-run test2))))
 
 (defun run-self-tests ()
   (run-tests (suite 'self-tests)))
