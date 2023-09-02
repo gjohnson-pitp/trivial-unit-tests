@@ -1,8 +1,6 @@
 
 (in-package :trivial-unit-tests)
 
-(setf (suite 'self-tests) (make-instance 'suite :name 'self-tests))
-
 (setf (suite 'test-tests) (make-instance 'suite :name 'test-tests))
 
 (setf (suite 'suite-tests) (make-instance 'suite :name 'suite-tests))
