@@ -19,6 +19,10 @@
                  :name 'should-fail
                  :body (lambda () (error "Failing on purpose."))))
 
+(defun run-test-without-output (test)
+  (with-open-stream (*standard-output* (make-broadcast-stream))
+    (run-test test)))
+
 (deftest should-call-on-fail (test-tests)
   (let ((on-fail-called nil)
         (test (make-failing-test)))
@@ -26,8 +30,7 @@
       (setq on-fail-called t)
       (call-next-method))
     (assert (not on-fail-called))
-    (with-open-stream (*standard-output* (make-broadcast-stream))
-      (run-test test))
+    (run-test-without-output test)
     (assert on-fail-called)))
 
 (deftest should-print-failure-message (test-tests)
