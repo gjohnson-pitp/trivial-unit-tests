@@ -14,11 +14,14 @@
     (run-test test)
     (assert was-run)))
 
+(defun make-failing-test ()
+  (make-instance 'test
+                 :name 'should-fail
+                 :body (lambda () (error "Failing on purpose."))))
+
 (deftest should-call-on-fail (test-tests)
   (let ((on-fail-called nil)
-        (test (make-instance 'test
-                             :name 'should-fail
-                             :body (lambda () (error "Failing on purpose.")))))
+        (test (make-failing-test)))
     (defmethod on-fail ((test (eql test)) error)
       (setq on-fail-called t)
       (call-next-method))
@@ -29,11 +32,7 @@
 
 (deftest should-print-failure-message (test-tests)
   (assert (string= (with-output-to-string (*standard-output*)
-                     (run-test (make-instance
-                                'test
-                                :name 'should-fail
-                                :body (lambda ()
-                                        (error "Failing on purpose.")))))
+                     (run-test (make-failing-test)))
                    "In SHOULD-FAIL: Failing on purpose.")))
 
 (defclass mock-test ()
