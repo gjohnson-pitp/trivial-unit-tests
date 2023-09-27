@@ -1,16 +1,6 @@
 
 (in-package :trivial-unit-tests)
 
-(defclass mock-test ()
-  ((name :reader test-name
-         :initarg :name)
-   (was-run :accessor was-run
-            :initform nil))
-  (:default-initargs :name (gensym)))
-
-(defmethod run-test ((test mock-test))
-  (setf (was-run test) t))
-
 (setf (suite 'self-tests) (make-instance 'suite :name 'self-tests))
 
 (setf (suite 'test-tests) (make-instance 'suite :name 'test-tests))
@@ -47,6 +37,16 @@
                                 :body (lambda ()
                                         (error "Failing on purpose.")))))
                    "In SHOULD-FAIL: Failing on purpose.")))
+
+(defclass mock-test ()
+  ((name :reader test-name
+         :initarg :name)
+   (was-run :accessor was-run
+            :initform nil))
+  (:default-initargs :name (gensym)))
+
+(defmethod run-test ((test mock-test))
+  (setf (was-run test) t))
 
 (deftest should-call-all-tests-in-suite (suite-tests)
   (let ((suite (make-instance 'suite :name 'example))
