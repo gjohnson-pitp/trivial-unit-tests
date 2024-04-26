@@ -34,8 +34,9 @@
     (assert on-fail-called)))
 
 (deftest should-print-failure-message (test-tests)
-  (assert (string= (with-output-to-string (*standard-output*)
-                     (run-test (make-failing-test)))
+  (assert (string= (let ((*package* (find-package :trivial-unit-tests)))
+                     (with-output-to-string (*standard-output*)
+                       (run-test (make-failing-test))))
                    "In SHOULD-FAIL: Failing on purpose.")))
 
 (defclass mock-test ()
